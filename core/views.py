@@ -1,10 +1,10 @@
 from django.shortcuts import render
 from django.views import View
-from django.views.generic import TemplateView,ListView,DeleteView
+from django.views.generic import TemplateView,ListView,DeleteView,FormView,CreateView,UpdateView
 from .models import  Post
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-
+from .forms import PostForm 
 # Create your views here.
 def index(request):
     return render(request,'core/index.html')
@@ -44,3 +44,34 @@ class PostDetailView(DeleteView):
     def get_objet(self,query_set=None):
         query_set = Post.objects.filter(title__contains = 'Dasturlash ')
         return get_object_or_404(query_set,pk=2 )
+    
+    
+    
+    
+class PostFormView(FormView):
+    form_class = PostForm
+    template_name = 'core/post_create.html'
+    success_url = "/"
+    
+    
+    
+    # def form_valid(self, form):
+    #     title = form.cleaned_data['title']
+    #     content = form.cleaned_data['content']
+    #     Post.objects.create(title = title,content = content)
+    #     return super().form_valid(form)
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+    
+    
+class PostCreateView(CreateView):
+    model = Post
+    fields = ['title','content']
+    success_url = '/'
+    template_name = 'core/post_create.html'
+    
+    
+class PostDeleteView(DeleteView):
+    model = Post
+    template_name = 'core/confirm.html'
